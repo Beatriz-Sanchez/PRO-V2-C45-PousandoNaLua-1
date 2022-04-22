@@ -11,7 +11,6 @@ var vx = 0;
 var vy = 0;
 var g = 0.05;
 var fuel = 100;
-var timer;
 var obstacle_img;
 var lz_img;
 
@@ -44,7 +43,6 @@ function preload()
 function setup() {
   createCanvas(1000,700);
   frameRate(80);
-  timer = 1500;
 
   //velocidade correta de cada animação
   thrust.frameDelay = 5;
