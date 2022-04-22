@@ -17,17 +17,22 @@ var lz_img;
 
 function preload()
 {
+  //imagem inicial do sprite
   lander_img = loadImage("normal.png");
   bg_img = loadImage("bg.png");
+  //animações: cima, direita, esquerda, normal e pouso
   thrust = loadAnimation("b_thrust_1.png","b_thrust_2.png","b_thrust_3.png");
   crash= loadAnimation("crash1.png","crash2.png","crash3.png");
   land = loadAnimation("landing1.png" ,"landing2.png","landing_3.png");
   rcs_left = loadAnimation("left_thruster_1.png","left_thruster_2.png");
   normal = loadAnimation("normal.png");
   rcs_right = loadAnimation("right_thruster_1.png","right_thruster_2.png");
+ 
   obstacle_img = loadImage("obstacle.png");
+  //zona de pouso
   lz_img = loadImage("lz.png");
 
+  //looping falso para todas as animações
   thrust.playing= true;
   thrust.looping= false;
   land.looping = false;
@@ -41,11 +46,13 @@ function setup() {
   frameRate(80);
   timer = 1500;
 
+  //velocidade correta de cada animação
   thrust.frameDelay = 5;
   land.frameDelay = 5;
   crash.frameDelay = 10;
   rcs_left.frameDelay = 5;
 
+  //foguete e suas animações
   lander = createSprite(100,50,30,30);
   lander.addImage(lander_img);
   lander.scale = 0.1;
@@ -59,25 +66,30 @@ function setup() {
   lander.addAnimation('normal',normal);
   lander.addAnimation('right',rcs_right);
 
+  //obstaculo
   obs = createSprite(320,530,50,100);
   obs.addImage(obstacle_img);
   obs.scale = 0.5;
   obs.setCollider("rectangle",0,100,300,300);
 
   ground = createSprite(500,690,1000,20);
+  
+  //zona de pouso
   lz = createSprite(880,610,50,30);
   lz.addImage(lz_img);
   lz.scale = 0.3;
-
   lz.setCollider("rectangle",0,180,400,100)
+  
   rectMode(CENTER);
   textSize(15);
 }
 
 function draw() 
 {
-  background(51);
-  image(bg_img,0,0);
+  //pade colocar a imagem direto no background também
+  background(bg_img);
+  
+  //textos
   push()
   fill(255);
   text("Velocidade Horizontal: " +round(vx,2),800,50);
@@ -85,10 +97,20 @@ function draw()
   text("Velocidade Vertical: "+round(vy),800,75);
   pop();
 
-  //descida
+  //velocidade e gravidade
   vy +=g;
   lander.position.y+=vy;
   lander.position.x +=vx;
+  
+  //detecção de colisão com o solo
+  if(lander.collide(ground)==true)
+  {
+    console.log("collided");
+    lander.changeAnimation('crashing');
+    vx = 0;
+    vy = 0;
+    g = 0;
+  }
 
   //detecção de obstáculo
   if(lander.collide(obs)==true)
@@ -110,18 +132,10 @@ function draw()
     lander.changeAnimation('landing');
   }
 
-  if(lander.collide(ground)==true)
-  {
-    console.log("collided");
-    lander.changeAnimation('crashing');
-    vx = 0;
-    vy = 0;
-    g = 0;
-  }
-
   drawSprites();
 }
 
+//movimentos
 function keyPressed()
 {
   if(keyCode==UP_ARROW && fuel>0)
